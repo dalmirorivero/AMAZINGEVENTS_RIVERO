@@ -100,7 +100,7 @@ button:hover {
     align-items: center;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: space-around;
     padding-bottom: 2%;
 
 }
@@ -110,6 +110,8 @@ button:hover {
     text-align: center;
     box-shadow: 0 4px 8px 0 #000000;
     max-width: 300px;
+    margin-top: 1%;
+    margin-bottom: 1%;
     padding: 1%;
 }
 
@@ -290,9 +292,9 @@ td {
         width: 100%;
     }
 
-    .events {
+    /* .events {
         flex-wrap: nowrap;
-    }
+    } */
 
     .form {
         justify-content: center;

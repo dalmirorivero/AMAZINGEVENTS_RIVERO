@@ -1,5 +1,3 @@
-// let events = document.getElementsByClassName("events")
-
 const data = {
     "currentDate": "2022-01-01",
     "events": [
@@ -178,21 +176,21 @@ const fragment = document.createDocumentFragment();
 
   function events(array, eventosjs){
     for(event of array.events){
+        if (event.date <= array.currentDate){
       let div = document.createElement("div");
       div.className = "card"
-      div.innerHTML +=`
-      <div class="card">
-          <img src="${event.image}" alt="product1" style="width: 100%">
-          <h1>${event.name}</h1>
-          <p class="title">
-            ${event.category}
-          </p>
-          <p>PRICE: $$$</p>
-          <p><button>MORE INFO</button></p>
-        </div>
-        `
+      div.innerHTML += 
+      `
+      <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
+      <h1>${event.name}</h1>
+      <p class="title">
+        ${event.category}
+      </p>
+      <p>PRICE: $${event.price}</p>
+      <p><button>MORE INFO</button></p>
+    `
 fragment.appendChild(div)
-
+}
     }
     eventosjs.appendChild(fragment)
   }
