@@ -172,26 +172,50 @@ const data = {
     ]
   }
 
-const fragment = document.createDocumentFragment();
+// const fragment = document.createDocumentFragment();
 
-  function events(array, eventosjs){
-    for(event of array.events){
-        if (event.date>array.currentDate){
-      let div = document.createElement("div");
-      div.className = "card"
-      div.innerHTML +=
-      `
-          <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
-          <h1>${event.name}</h1>
-          <p class="title">
-            ${event.category}
-          </p>
-          <p>PRICE: $${event.price}</p>
-          <p><button>MORE INFO</button></p>
-        `
-fragment.appendChild(div)
+//   function events(array, eventosjs){
+//     for(event of array.events){
+//         if (event.date>array.currentDate){
+//       let div = document.createElement("div");
+//       div.className = "card"
+//       div.innerHTML +=
+//       `
+//           <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
+//           <h1>${event.name}</h1>
+//           <p class="title">
+//             ${event.category}
+//           </p>
+//           <p>PRICE: $${event.price}</p>
+//           <p><button>MORE INFO</button></p>
+//         `
+// fragment.appendChild(div)
+// }
+//     }
+//     eventosjs.appendChild(fragment)
+//   }
+//   events(data, eventosjs)
+
+  const fragment = document.createDocumentFragment();
+
+function events(array, eventosjs){
+  array.events.filter((event) => event.date >= array.currentDate)
+    .forEach((event) => {
+    let div = document.createElement("div");
+    div.className = "card"
+    div.innerHTML += 
+    `
+    <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
+    <h1>${event.name}</h1>
+    <p class="title">
+      ${event.category}
+    </p>
+    <p>PRICE: $${event.price}</p>
+    <p><button>MORE INFO</button></p>
+  `
+    fragment.appendChild(div)
+  });
+  eventosjs.appendChild(fragment)
 }
-    }
-    eventosjs.appendChild(fragment)
-  }
-  events(data, eventosjs)
+
+events(data, eventosjs);

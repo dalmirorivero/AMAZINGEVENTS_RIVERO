@@ -172,13 +172,36 @@ const data = {
     ]
   }
 
+// const fragment = document.createDocumentFragment();
+
+//   function events(array, eventosjs){
+//     for(event of array.events){
+//       let div = document.createElement("div");
+//       div.className = "card"
+//       div.innerHTML += 
+//       `
+//       <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
+//       <h1>${event.name}</h1>
+//       <p class="title">
+//         ${event.category}
+//       </p>
+//       <p>PRICE: $${event.price}</p>
+//       <p><button>MORE INFO</button></p>
+//     `
+// fragment.appendChild(div)
+
+//     }
+//     eventosjs.appendChild(fragment)
+//   }
+//   events(data, eventosjs)
+
 const fragment = document.createDocumentFragment();
 
-  function events(array, eventosjs){
-    for(event of array.events){
-      let div = document.createElement("div");
-      div.className = "card"
-      div.innerHTML += 
+function events(array, eventosjs) {
+  array.events.forEach((event) => {
+    let div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML +=
       `
       <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
       <h1>${event.name}</h1>
@@ -188,9 +211,9 @@ const fragment = document.createDocumentFragment();
       <p>PRICE: $${event.price}</p>
       <p><button>MORE INFO</button></p>
     `
-fragment.appendChild(div)
+    fragment.appendChild(div)
+  })
 
-    }
-    eventosjs.appendChild(fragment)
-  }
-  events(data, eventosjs)
+  eventosjs.appendChild(fragment);
+}
+events(data, eventosjs)
