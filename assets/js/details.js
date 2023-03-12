@@ -1,16 +1,17 @@
-import data from './data.js'
-
 const details = document.getElementById('details')
-
 const queryString = location.search;
 const params = new URLSearchParams(queryString);
-const eventID = params.get('_id');
-const event = data.events.find(event => event._id == eventID);
 
-console.log(details)
+fetch('../assets/amazing.json')
+  .then(response => response.json())
+  .then(data => {
+    const eventID = params.get('_id');
+    const event = data.events.find(event => event._id == eventID);
+    eventDetail(event, details);
+  })
+  .catch(error => console.error(error));
 
 function eventDetail(event, details){
-   
     let div = document.createElement('div')
     div.className = "box";
     div.innerHTML=  `
@@ -25,10 +26,7 @@ function eventDetail(event, details){
           </div>
           <img class="image" src="${event.image}" alt="Image">
         </div>
-         `
-         details.appendChild(div)
-
-
+        `
+        details.appendChild(div)
 }
 
-eventDetail(event, details)

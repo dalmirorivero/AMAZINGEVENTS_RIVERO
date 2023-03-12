@@ -182,14 +182,20 @@ input#name {
     cursor: text;
 }
 
-input[type="submit" i] {
+#contactsubmit{
     border: none;
+   background-color: transparent;
     font-size: larger;
     font-weight: bold;
+    text-decoration: none;
+    color: #000000;
+    margin: 10px;
 }
 
-input[type="submit" i]:hover {
+#contactsubmit:hover{
+    background-color: transparent;
     text-shadow: 0px 0px 25px #d90368;
+box-shadow: 0px 0px 25px #d90368;
 }
 
 /* ELEMENTOS STATS */
