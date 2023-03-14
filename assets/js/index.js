@@ -1,13 +1,77 @@
-// DATA
+// VARIABLES GLOBALES
+
+let data = []
+let categories = ""
+let checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
 
 
-import data from './data.js'
+// ELEMENTOS DOM
+
+const eventosjs = document.getElementById('eventosjs');
+const fragment = document.createDocumentFragment();
+const search = document.querySelector('input[type="search" i]');
+
+// FETCH JSON DATA
+
+fetch("../assets/amazing.json")
+.then(response => response.json())
+.then((data) => {
+
+  // CARD GENERATION
+  cardEvents(data, eventosjs);
+  // CREATE CATEGORIES
+  categories = arrayCategories(data);
+  // CHECKBOX GENERATION
+  checkboxFilter(categories, checkbox);
+  checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
+  // SEARCH FILTER EVENT
+  search.addEventListener('input', () => {
+    const filteredEvents = filterEvents(search.value, data.events);
+    cardEvents({ events: filteredEvents }, eventosjs);
+  });
+  // CHECKBOX FILTER
+  CheckboxChange(data, eventosjs, checkboxes);
+  // FUNCION DE FILTROS COMBINADOS
+  function applyFilters() {
+    const searchValue = search.value.trim();
+    const checkedCategories = Array.from(checkboxes)
+      .filter(c => c.checked)
+      .map(c => c.id);
+  
+    if (searchValue === "" && checkedCategories.length === 0) {
+      cardEvents(data, eventosjs);
+    } else {
+      let filteredEvents = data.events;
+  
+      if (searchValue !== "") {
+        filteredEvents = filterEvents(searchValue, filteredEvents);
+      }
+  
+      if (checkedCategories.length !== 0) {
+        filteredEvents = filteredEvents.filter(event => {
+          return checkedCategories.includes(event.category.toLowerCase());
+        });
+      }
+  
+      if (filteredEvents.length === 0) {
+        eventosjs.innerHTML = "<p>No matching events found.</p>";
+      } else {
+        cardEvents({ events: filteredEvents }, eventosjs);
+      }
+    }
+  }
+  // BOTH FUNCTION EVENT
+  search.addEventListener('input', applyFilters);
+  checkboxes.forEach(checkbox => {
+  checkbox.addEventListener('change', applyFilters);
+  });
+
+})
+.catch(error => console.log(error));
 
 
 // FUNCION PARA CREAR CARDS DINAMICAS
 
-const eventosjs = document.getElementById('eventosjs');
-const fragment = document.createDocumentFragment();
 
 function cardEvents(array, eventosjs) {
   eventosjs.innerHTML = ""
@@ -30,11 +94,8 @@ function cardEvents(array, eventosjs) {
   eventosjs.appendChild(fragment);
 }
 
-cardEvents(data, eventosjs)
-
 
 // FUNCION PARA CREAR CATEGORIAS
-
 
 const arrayCategories = (array) =>{
   let categories =  array.events.map(category=> category.category)
@@ -47,11 +108,8 @@ const arrayCategories = (array) =>{
 return categories
 }
 
-let categories = arrayCategories(data)
-
 
 // FUNCION PARA CREAR CHECKBOXES DINAMICAS
-
 
 const checkboxFilter = (array, checkbox) => {
   let newForm = document.createElement('form');
@@ -74,13 +132,8 @@ const checkboxFilter = (array, checkbox) => {
   checkbox.appendChild(newForm);
 };
 
-checkboxFilter(categories, checkbox);
-
 
 // FUNCION PARA FILTRAR CARDS POR BUSQUEDA
-
-
-const search = document.querySelector('input[type="search" i]');
 
 function filterEvents(searchValue, events) {
   return events.filter(event =>
@@ -90,69 +143,31 @@ function filterEvents(searchValue, events) {
   );
 }
 
-search.addEventListener('input', () => {
-  const filteredEvents = filterEvents(search.value, data.events);
-  cardEvents({ events: filteredEvents }, eventosjs);
-});
-
 
 //  FUNCION PARA FILTRAR CARDS POR CHECKBOXES
 
+function CheckboxChange(data, eventosjs, checkboxes) {
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      const checkedCategories = Array.from(checkboxes)
+        .filter(c => c.checked)
+        .map(c => c.id);
 
-const checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
+      if (checkedCategories.length === 0) {
+        cardEvents(data, eventosjs);
+      } else {
+        const filteredEvents = data.events.filter(event => {
+          return checkedCategories.includes(event.category.toLowerCase());
+        });
 
-checkboxes.forEach(checkbox => {
-  checkbox.addEventListener('change', () => {
-    const checkedCategories = Array.from(checkboxes)
-      .filter(c => c.checked)
-      .map(c => c.id);
-
-    if (checkedCategories.length === 0) {
-      cardEvents(data, eventosjs);
-    } else {
-      const filteredEvents = data.events.filter(event => {
-        return checkedCategories.includes(event.category.toLowerCase());
-      });
-
-      cardEvents({ events: filteredEvents }, eventosjs);
-    }
+        cardEvents({ events: filteredEvents }, eventosjs);
+      }
+    });
   });
-});
-
-
-// FUNCION COMBINADA
-
-function applyFilters() {
-  const searchValue = search.value.trim();
-  const checkedCategories = Array.from(checkboxes)
-    .filter(c => c.checked)
-    .map(c => c.id);
-
-  if (searchValue === "" && checkedCategories.length === 0) {
-    cardEvents(data, eventosjs);
-  } else {
-    let filteredEvents = data.events;
-
-    if (searchValue !== "") {
-      filteredEvents = filterEvents(searchValue, filteredEvents);
-    }
-
-    if (checkedCategories.length !== 0) {
-      filteredEvents = filteredEvents.filter(event => {
-        return checkedCategories.includes(event.category.toLowerCase());
-      });
-    }
-
-    if (filteredEvents.length === 0) {
-      eventosjs.innerHTML = "<p>No matching events found.</p>";
-    } else {
-      cardEvents({ events: filteredEvents }, eventosjs);
-    }
-  }
 }
 
 
-search.addEventListener('input', applyFilters);
-checkboxes.forEach(checkbox => {
-  checkbox.addEventListener('change', applyFilters);
-});
+
+
+
+
