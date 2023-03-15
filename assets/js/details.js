@@ -1,20 +1,30 @@
+// ELEMENTOS DOM
+
 const details = document.getElementById('details')
 const queryString = location.search;
 const params = new URLSearchParams(queryString);
 
-fetch('../assets/amazing.json')
-  .then(response => response.json())
-  .then(data => {
-    const eventID = params.get('_id');
-    const event = data.events.find(event => event._id == eventID);
-    eventDetail(event, details);
-  })
-  .catch(error => console.error(error));
+// FETCH JSON DATA
 
-function eventDetail(event, details){
-    let div = document.createElement('div')
-    div.className = "box";
-    div.innerHTML=  `
+async function eventDetails() {
+  try {
+    const response = await fetch("../assets/amazing.json");
+    const json = await response.json();
+    const eventID = params.get('_id');
+    const event = json.events.find(event => event._id == eventID);
+    eventDetail(event, details);
+  }
+  catch (error) { console.error(error); }
+}
+
+eventDetails();
+
+// FUNCION PARA CREAR TARJETA DE EVENTO
+
+function eventDetail(event, details) {
+  let div = document.createElement('div')
+  div.className = "box";
+  div.innerHTML = `
     <div class="title-container">
             <div class="title" style="font-size: 30px;">${event.name.toUpperCase()}</div>
             <div class="description">
@@ -27,6 +37,6 @@ function eventDetail(event, details){
           <img class="image" src="${event.image}" alt="Image">
         </div>
         `
-        details.appendChild(div)
+  details.appendChild(div)
 }
 

@@ -1,21 +1,86 @@
-// DATA
+// VARIABLES GLOBALES
 
+let data = []
+let categories = ""
+let currentDate = data.currentDate;
+let checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
 
-import data from './data.js'
-
-
-// FUNCION PARA CREAR CARDS DINAMICAS SEGUN FECHA
-
+// ELEMENTOS DEL DOM
 
 const eventosjs = document.getElementById('eventosjs');
 const fragment = document.createDocumentFragment();
-const currentDate = data.currentDate;
+const search = document.querySelector('input[type="search" i]');
+
+// FETCH JSON DATA
+
+async function past() {
+  try {
+    const response = await fetch("../assets/amazing.json");
+    const json = await response.json();
+    // IMPRECION DE CARDS SEGUN FECHA
+    currentDate = json.currentDate
+    cardEvents(json, eventosjs, currentDate);
+    // CREACION DE CATEGORIAS
+    categories = arrayCategories(json)
+    // GENERAMOS CEHCKBOX DINAMICAS
+    checkboxFilter(categories, checkbox);
+    checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
+    // EVENTO DEL FILTRO SEARCH
+    search.addEventListener('input', () => {
+      const filteredEvents = filterEvents(search.value, json.events);
+      cardEvents({ events: filteredEvents }, eventosjs);
+    });
+    // LLAMADA A LA FUNCION DEL FILTRO POR CHECKBOXES
+    CheckboxChange(json, eventosjs, checkboxes);
+    // DECLARO LA FUNCION COMBINADA
+    function applyFilters() {
+      const searchValue = search.value.trim();
+      const checkedCategories = Array.from(checkboxes)
+        .filter(c => c.checked)
+        .map(c => c.id);
+
+      if (searchValue === "" && checkedCategories.length === 0) {
+        cardEvents(json, eventosjs, currentDate);
+      } else {
+        let filteredEvents = json.events;
+
+        if (searchValue !== "") {
+          filteredEvents = filterEvents(searchValue, filteredEvents);
+        }
+
+        if (checkedCategories.length !== 0) {
+          filteredEvents = filteredEvents.filter(event => {
+            return checkedCategories.includes(event.category.toLowerCase());
+          });
+        }
+
+        if (filteredEvents.length === 0) {
+          eventosjs.innerHTML = "<p>No matching events found.</p>";
+        } else {
+          cardEvents({ events: filteredEvents, currentDate: json.currentDate }, eventosjs);
+        }
+      }
+    }
+    // EVENTO DE LA FUNCION COMBINADA
+    search.addEventListener('input', applyFilters);
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', applyFilters);
+    });
+  }
+  catch (error) {
+    console.log(error);
+  }
+}
+
+past();
+
+// FUNCION PARA CREAR CARDS DINAMICAS SEGUN FECHA
 
 function cardEvents(array, eventosjs, currentDate) {
   eventosjs.innerHTML = "";
   let filteredEvents = array.events;
   if (currentDate) {
-    filteredEvents = filteredEvents.filter(event => event.date<= array.currentDate);
+    filteredEvents = filteredEvents.filter(event => event.date <= array.currentDate);
   }
   filteredEvents.forEach(event => {
     let div = document.createElement("div");
@@ -35,133 +100,72 @@ function cardEvents(array, eventosjs, currentDate) {
   eventosjs.appendChild(fragment);
 }
 
-cardEvents(data, eventosjs, currentDate)
-
-
 // FUNCION PARA CREAR CATEGORIAS
 
-
-const arrayCategories = (array) =>{
-  let categories =  array.events.map(category=> category.category)
-  categories = categories.reduce((acumulador, elemento)=>{
-    if(!acumulador.includes(elemento)){
+const arrayCategories = (array) => {
+  let categories = array.events.map(category => category.category)
+  categories = categories.reduce((acumulador, elemento) => {
+    if (!acumulador.includes(elemento)) {
       acumulador.push(elemento);
     }
     return acumulador
   }, [])
-return categories
+  return categories
 }
 
-let categories = arrayCategories(data)
-
-
 // FUNCION PARA CREAR CHECKBOXES DINAMICAS
-
 
 const checkboxFilter = (array, checkbox) => {
   let newForm = document.createElement('form');
   newForm.className = 'checkfilter';
-  
+
   array.forEach(category => {
     let input = document.createElement('input');
     input.type = 'checkbox';
     input.id = category.toLowerCase();
     input.name = 'category';
-    
+
     let label = document.createElement('label');
     label.setAttribute('for', category.toLowerCase());
     label.innerText = category;
-    
+
     newForm.appendChild(input);
     newForm.appendChild(label);
   });
-  
+
   checkbox.appendChild(newForm);
 };
 
-checkboxFilter(categories, checkbox);
-
-
 // FUNCION PARA FILTRAR CARDS POR BUSQUEDA
-
-
-const search = document.querySelector('input[type="search" i]');
 
 function filterEvents(searchValue, events) {
   return events.filter(event =>
     event.name.toLowerCase().includes(searchValue.toLowerCase()) ||
     event.description.toLowerCase().includes(searchValue.toLowerCase()) ||
     event.category.toLowerCase().includes(searchValue.toLowerCase())
-    
   );
-
-  
 }
-
-search.addEventListener('input', () => {
-  const filteredEvents = filterEvents(search.value, data.events);
-  cardEvents({ events: filteredEvents }, eventosjs);
-});
-
 
 //  FUNCION PARA FILTRAR CARDS POR CHECKBOXES
 
+function CheckboxChange(data, eventosjs, checkboxes) {
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      const checkedCategories = Array.from(checkboxes)
+        .filter(c => c.checked)
+        .map(c => c.id);
 
-const checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
+      if (checkedCategories.length === 0) {
+        cardEvents(data, eventosjs);
+      } else {
+        const filteredEvents = data.events.filter(event => {
+          return checkedCategories.includes(event.category.toLowerCase());
+        });
 
-checkboxes.forEach(checkbox => {
-  checkbox.addEventListener('change', () => {
-    const checkedCategories = Array.from(checkboxes)
-      .filter(c => c.checked)
-      .map(c => c.id);
-
-    if (checkedCategories.length === 0) {
-      cardEvents(data, eventosjs);
-    } else {
-      const filteredEvents = data.events.filter(event => {
-        return checkedCategories.includes(event.category.toLowerCase());
-      });
-
-      cardEvents({ events: filteredEvents}, eventosjs);
-    }
+        cardEvents({ events: filteredEvents }, eventosjs);
+      }
+    });
   });
-});
-
-
-// FUNCION COMBINADA
-
-function applyFilters() {
-  const searchValue = search.value.trim();
-  const checkedCategories = Array.from(checkboxes)
-    .filter(c => c.checked)
-    .map(c => c.id);
-
-  if (searchValue === "" && checkedCategories.length === 0) {
-    cardEvents(data, eventosjs, currentDate);
-  } else {
-    let filteredEvents = data.events;
-
-    if (searchValue !== "") {
-      filteredEvents = filterEvents(searchValue, filteredEvents);
-    }
-
-    if (checkedCategories.length !== 0) {
-      filteredEvents = filteredEvents.filter(event => {
-        return checkedCategories.includes(event.category.toLowerCase());
-      });
-    }
-
-    if (filteredEvents.length === 0) {
-      eventosjs.innerHTML = "<p>No matching events found.</p>";
-    } else {
-      cardEvents({ events: filteredEvents, currentDate: data.currentDate}, eventosjs);
-    }
-  }
 }
 
-
-search.addEventListener('input', applyFilters);
-checkboxes.forEach(checkbox => {
-  checkbox.addEventListener('change', applyFilters);
-});
 
