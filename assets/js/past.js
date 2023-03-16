@@ -2,10 +2,9 @@
 
 let data = []
 let categories = ""
-let currentDate = data.currentDate;
 let checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
 
-// ELEMENTOS DEL DOM
+//ELEMENTOS DEL DOM
 
 const eventosjs = document.getElementById('eventosjs');
 const fragment = document.createDocumentFragment();
@@ -13,16 +12,15 @@ const search = document.querySelector('input[type="search" i]');
 
 // FETCH JSON DATA
 
-async function past() {
+async function upcoming() {
   try {
     const response = await fetch("../assets/amazing.json");
     const json = await response.json();
-    // IMPRECION DE CARDS SEGUN FECHA
-    currentDate = json.currentDate
-    cardEvents(json, eventosjs, currentDate);
+    // IMPRESION DE CARDS SEGUN FECHA
+    cardEvents(json, eventosjs);
     // CREACION DE CATEGORIAS
     categories = arrayCategories(json)
-    // GENERAMOS CEHCKBOX DINAMICAS
+    // GENERAMOS CHECKBOXES DINAMICAS
     checkboxFilter(categories, checkbox);
     checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
     // EVENTO DEL FILTRO SEARCH
@@ -40,9 +38,9 @@ async function past() {
         .map(c => c.id);
 
       if (searchValue === "" && checkedCategories.length === 0) {
-        cardEvents(json, eventosjs, currentDate);
+        cardEvents(json, eventosjs);
       } else {
-        let filteredEvents = json.events;
+        let filteredEvents = json.events.filter(event => new Date(event.date) <= new Date());
 
         if (searchValue !== "") {
           filteredEvents = filterEvents(searchValue, filteredEvents);
@@ -57,7 +55,7 @@ async function past() {
         if (filteredEvents.length === 0) {
           eventosjs.innerHTML = "<p>No matching events found.</p>";
         } else {
-          cardEvents({ events: filteredEvents, currentDate: json.currentDate }, eventosjs);
+          cardEvents({ events: filteredEvents }, eventosjs);
         }
       }
     }
@@ -72,32 +70,29 @@ async function past() {
   }
 }
 
-past();
+upcoming();
 
 // FUNCION PARA CREAR CARDS DINAMICAS SEGUN FECHA
 
-function cardEvents(array, eventosjs, currentDate) {
-  eventosjs.innerHTML = "";
-  let filteredEvents = array.events;
-  if (currentDate) {
-    filteredEvents = filteredEvents.filter(event => event.date <= array.currentDate);
-  }
+function cardEvents(array, eventosjs) {
+  eventosjs.innerHTML = ""
+  let filteredEvents = array.events.filter(event => new Date(event.date) <= new Date());
   filteredEvents.forEach(event => {
     let div = document.createElement("div");
-    div.className = "card";
+    div.className = "card"
     div.innerHTML +=
       `
-      <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
-      <h1>${event.name}</h1>
-      <p class="title">
-        ${event.category}
-      </p>
-      <p>PRICE: $${event.price}</p>
-      <p style="padding: 5px; font-weight: bold;"><a href="../pages/details.html?_id=${event._id}"class="button">MORE INFO</a></p>
-    `;
-    fragment.appendChild(div);
+    <img src="${event.image}" alt="product1" style="width: 250px; height: 150px;">
+    <h1>${event.name}</h1>
+    <p class="title">
+      ${event.category}
+    </p>
+    <p>PRICE: $${event.price}</p>
+    <p style="padding: 5px; font-weight: bold;"><a href="../pages/details.html?_id=${event._id}"class="button">MORE INFO</a></p>
+  `
+    fragment.appendChild(div)
   });
-  eventosjs.appendChild(fragment);
+  eventosjs.appendChild(fragment)
 }
 
 // FUNCION PARA CREAR CATEGORIAS
@@ -143,7 +138,7 @@ function filterEvents(searchValue, events) {
     event.name.toLowerCase().includes(searchValue.toLowerCase()) ||
     event.description.toLowerCase().includes(searchValue.toLowerCase()) ||
     event.category.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  )
 }
 
 //  FUNCION PARA FILTRAR CARDS POR CHECKBOXES
@@ -167,5 +162,6 @@ function CheckboxChange(data, eventosjs, checkboxes) {
     });
   });
 }
+
 
 

@@ -2,7 +2,6 @@
 
 let data = []
 let categories = ""
-let currentDate = data.currentDate;
 let checkboxes = document.querySelectorAll('.checkfilter input[type="checkbox"]');
 
 //ELEMENTOS DEL DOM
@@ -18,8 +17,7 @@ async function upcoming() {
     const response = await fetch("../assets/amazing.json");
     const json = await response.json();
     // IMPRESION DE CARDS SEGUN FECHA
-    currentDate = json.currentDate
-    cardEvents(json, eventosjs, currentDate);
+    cardEvents(json, eventosjs);
     // CREACION DE CATEGORIAS
     categories = arrayCategories(json)
     // GENERAMOS CHECKBOXES DINAMICAS
@@ -40,9 +38,9 @@ async function upcoming() {
         .map(c => c.id);
 
       if (searchValue === "" && checkedCategories.length === 0) {
-        cardEvents(json, eventosjs, currentDate);
+        cardEvents(json, eventosjs);
       } else {
-        let filteredEvents = json.events;
+        let filteredEvents = json.events.filter(event => new Date(event.date) >= new Date());
 
         if (searchValue !== "") {
           filteredEvents = filterEvents(searchValue, filteredEvents);
@@ -57,7 +55,7 @@ async function upcoming() {
         if (filteredEvents.length === 0) {
           eventosjs.innerHTML = "<p>No matching events found.</p>";
         } else {
-          cardEvents({ events: filteredEvents, currentDate: json.currentDate }, eventosjs);
+          cardEvents({ events: filteredEvents }, eventosjs);
         }
       }
     }
@@ -76,12 +74,9 @@ upcoming();
 
 // FUNCION PARA CREAR CARDS DINAMICAS SEGUN FECHA
 
-function cardEvents(array, eventosjs, currentDate) {
+function cardEvents(array, eventosjs) {
   eventosjs.innerHTML = ""
-  let filteredEvents = array.events;
-  if (currentDate) {
-    filteredEvents = filteredEvents.filter(event => event.date >= array.currentDate);
-  }
+  let filteredEvents = array.events.filter(event => new Date(event.date) >= new Date());
   filteredEvents.forEach(event => {
     let div = document.createElement("div");
     div.className = "card"
@@ -143,7 +138,7 @@ function filterEvents(searchValue, events) {
     event.name.toLowerCase().includes(searchValue.toLowerCase()) ||
     event.description.toLowerCase().includes(searchValue.toLowerCase()) ||
     event.category.toLowerCase().includes(searchValue.toLowerCase())
-  );
+  )
 }
 
 //  FUNCION PARA FILTRAR CARDS POR CHECKBOXES
