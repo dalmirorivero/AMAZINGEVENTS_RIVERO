@@ -14,7 +14,7 @@ const search = document.querySelector('input[type="search" i]');
 
 async function index() {
   try {
-    const response = await fetch("https://dalmirorivero.github.io/assets/amazing.json");
+    const response = await fetch("../assets/amazing.json");
     const json = await response.json();
     // IMPRESION DE CARDS
     cardEvents(json, eventosjs);
